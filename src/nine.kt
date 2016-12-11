@@ -18,9 +18,9 @@ fun length(start: Int, end: Int, s: String): Long {
         return 1 + length(start + 1, end, s)
 
     val marker = parseMarker(s, start)
-    val startNext = start + marker.length
-    val endNext = startNext + marker.numChars
-    return marker.repetitions * length(startNext, endNext, s) + length(endNext, end, s)
+    val nextStart = start + marker.length
+    val nextEnd = nextStart + marker.numChars
+    return marker.repetitions * length(nextStart, nextEnd, s) + length(nextEnd, end, s)
 }
 
 data class Marker(val length: Int, val numChars: Int, val repetitions: Long)
