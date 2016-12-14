@@ -1,5 +1,3 @@
-package seven
-
 import java.io.File
 
 val WIDTH = 50

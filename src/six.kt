@@ -1,8 +1,7 @@
-/**
- * Created by tlin on 06/12/16.
- */
+import java.io.File
+
 fun main(args: Array<String>) {
-    val lines = Files("input/six.txt").readLines()
+    val lines = File("input/six.txt").readLines()
     val charCount = Array(lines[0].length, { Array('z' - 'a' + 1, { 0 }) })
 
     for (line in lines)
