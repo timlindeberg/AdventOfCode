@@ -1,66 +1,43 @@
 import java.io.File
 import java.util.*
 
-data class Dijkstra(val distance: Int, val pos: Pos) : Comparable<Dijkstra> {
-    override fun compareTo(other: Dijkstra): Int {
-        return distance - other.distance
-    }
-
-}
-
 data class Pos(val x: Int, val y: Int)
 
-fun distance(distances: HashMap<Pos, Int>, pos: Pos): Int {
-    return distances[pos] ?: Int.MAX_VALUE
-}
-
 fun main(args: Array<String>) {
-
     val key = File("input/thirteen.txt").readText().toInt()
 
     val dist = HashMap<Pos, Int>()
-    val queue = TreeSet<Dijkstra>()
-    val parents = HashMap<Pos, Pos>()
-
+    val queue = ArrayDeque<Pos>()
+    val visited = HashSet<Pos>()
     val start = Pos(1, 1)
     val goal = Pos(31, 39)
-    val INF = 10000000
 
     dist[start] = 0
-    queue.add(Dijkstra(0, start))
-    var i = 0
-    while (queue.isNotEmpty() && i < 10000) {
-        val k = queue.first()
-        queue.remove(k)
-        val u = k.pos
+    queue.add(start)
+
+    while (queue.isNotEmpty()) {
+        val u = queue.pop()
+
+        if(dist[u]!! > 50)
+            break
+
+        if(visited.contains(u))
+            continue
+
+        visited.add(u)
+
         val (x, y) = u
 
-        println("$x, $y")
-
-        val neighbours = arrayOf(Pos(x + 1, y), Pos(x, y + 1), Pos(x - 1, y), Pos(x, y - 1))
-                .filter { !isWall(it, key) }
-
-        for (v in neighbours) {
-            val alt = (dist[u] ?: INF) + 1
-            val distv = dist[v] ?: INF
-            if (alt < distv) {
-                parents[v] = u
-                dist[v] = alt
-                queue.remove(Dijkstra(distv, v))
-                queue.add(Dijkstra(alt, v))
-            }
-        }
-        i++
+        arrayOf(Pos(x + 1, y), Pos(x, y + 1), Pos(x - 1, y), Pos(x, y - 1))
+                .filter{ v -> !isWall(v, key) && !visited.contains(v) }
+                .forEach { v ->
+                    val prevDist = dist[u] ?: 0
+                    dist[v] = prevDist + 1
+                    queue.add(v)
+                }
     }
 
-    var pos = goal
-    var d = 0
-    while (pos != start) {
-        println(pos)
-        pos = parents[pos]!!
-        d++
-    }
-    println(d)
+    println(dist.filterValues { it <= 50 }.size)
 }
 
 fun isWall(pos: Pos, key: Int): Boolean {
