@@ -1,22 +1,27 @@
+import java.io.File
 import java.security.MessageDigest
 import java.util.*
+import java.util.regex.Pattern
 
-val md5 = MessageDigest.getInstance("MD5")
+val md5 = MessageDigest.getInstance("MD5")!!
 
+val THREE = Pattern.compile("(\\w)\\1+\\1+")!!
+val FIVE = Pattern.compile("(\\w)\\1+\\1+\\1+\\1+")!!
 
 fun main(args: Array<String>) {
-    val num = 100000
-    val salt = "abc"
+    val num = 30000
+    val salt = File("input/fourteen.txt").readText()
     val threes = ArrayList<Pair<Int, Char>>()
     val fives = ArrayList<Pair<Int, Char>>()
 
     for(i in 0..num){
-        val s = MD5(salt + i)
-        val (t, f) = charsRepeating(s, i)
-        if(t != null)
-            threes.add(t)
-        if(f != null)
-            fives.add(f)
+        val s = stretchedHash(salt + i)
+        val three = charsRepeating(s, THREE)
+        if(three != '.')
+            threes.add(Pair(i,three))
+        val five = charsRepeating(s, FIVE)
+        if(five != '.')
+            fives.add(Pair(i,five))
     }
 
     println("Found threes and fives")
@@ -24,18 +29,14 @@ fun main(args: Array<String>) {
 
     for((indexThree, charThree) in threes){
         for((indexFive, charFive) in fives){
-            if(indexFive < indexThree)
+            if(indexFive <= indexThree)
                 continue
 
             if(indexFive > indexThree + 1000)
                 break
 
             if(charThree == charFive){
-                //println(charThree)
-                //println("$indexThree: ${MD5(salt + indexThree)}")
-                //println("$indexFive: ${MD5(salt + indexFive)}")
                 keys.add(indexThree)
-                println("Key: $indexThree")
                 break
             }
         }
@@ -44,24 +45,18 @@ fun main(args: Array<String>) {
     println("Key 64: ${keys[63]}")
 }
 
+fun stretchedHash(s: String): String{
+    return (1..2017).fold(s) { old, i -> MD5(old) }
+}
+
 fun MD5(s: String): String {
     val b = md5.digest(s.toByteArray())
     return toHexString(b)
 }
 
-data class Repeats(val three: Pair<Int, Char>?, val five: Pair<Int, Char>?)
-fun charsRepeating(s: String, index: Int): Repeats {
-    var i = 0
-    while (i < s.length) {
-        var j = 0
-        while (i + j + 1 < s.length && s[i] == s[i + j++ + 1]) { }
-
-        if (j == 3) return Repeats(Pair(index, s[i]), null)
-        if (j == 5) return Repeats(null, Pair(index, s[i]))
-
-        i += Math.max(j, 1)
-    }
-    return Repeats(null, null)
+fun charsRepeating(s: String, p: Pattern): Char {
+    val m = p.matcher(s)
+    return if (m.find()) return m.group(1)[0] else '.'
 }
 
 val hexArray = charArrayOf('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f')
