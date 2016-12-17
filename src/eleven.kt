@@ -5,8 +5,7 @@ import java.util.*
 // The third floor contains a thulium-compatible microchip.
 // The fourth floor contains nothing relevant.
 
-val visited = TreeSet<State>( { s1, s2 ->
-})
+val visited = TreeSet<State>()
 
 val ELEVATOR = Elevator()
 val SG = Generator('S')
@@ -126,7 +125,7 @@ data class Elevator(override val type: Char = 'E') : Obj {
 data class State(val floors: MutableList<MutableSet<Obj>>) : Comparable<State> {
 
     override fun compareTo(other: State): Int {
-        pairs.hashCode() - s2.pairs().hashCode()
+        pairs.hashCode() - other.pairs().hashCode()
         throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
