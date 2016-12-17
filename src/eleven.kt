@@ -5,7 +5,8 @@ import java.util.*
 // The third floor contains a thulium-compatible microchip.
 // The fourth floor contains nothing relevant.
 
-val visited = TreeSet<State>()
+val visited = TreeSet<State>( { s1, s2 ->
+})
 
 val ELEVATOR = Elevator()
 val SG = Generator('S')
@@ -19,6 +20,8 @@ val RM = Microchip('R')
 val CG = Generator('C')
 val CM = Microchip('C')
 
+val NUM_FLOORS = 4
+
 fun main(args: Array<String>) {
     // F4: .  .  .  .  .  .
     // F3: .  TM .  .  .  .
@@ -27,33 +30,42 @@ fun main(args: Array<String>) {
 
     // Constraints: Måste vara tillsammans (M och G)
 
-    val initState = State()
-    initState.floors[0].add(ELEVATOR)
-    initState.floors[0].add(SG)
-    initState.floors[0].add(SM)
-    initState.floors[0].add(PG)
-    initState.floors[0].add(PM)
+    val initFloors = ArrayList<MutableSet<Obj>>()
+    for (i in 0..NUM_FLOORS - 1)
+        initFloors.add(HashSet<Obj>())
+    
+    initFloors[0].add(ELEVATOR)
+    initFloors[0].add(SG)
+    initFloors[0].add(SM)
+    initFloors[0].add(PG)
+    initFloors[0].add(PM)
 
-    initState.floors[1].add(TG)
-    initState.floors[1].add(RG)
-    initState.floors[1].add(RM)
-    initState.floors[1].add(CG)
-    initState.floors[1].add(CM)
+    initFloors[1].add(TG)
+    initFloors[1].add(RG)
+    initFloors[1].add(RM)
+    initFloors[1].add(CG)
+    initFloors[1].add(CM)
 
-    initState.floors[2].add(TM)
+    initFloors[2].add(TM)
 
-    val victoryState = State()
-    victoryState.floors[3].add(ELEVATOR)
-    victoryState.floors[3].add(SG)
-    victoryState.floors[3].add(SM)
-    victoryState.floors[3].add(PG)
-    victoryState.floors[3].add(PM)
-    victoryState.floors[3].add(TG)
-    victoryState.floors[3].add(RG)
-    victoryState.floors[3].add(RM)
-    victoryState.floors[3].add(CG)
-    victoryState.floors[3].add(CM)
-    victoryState.floors[3].add(TM)
+    val victoryFloors = ArrayList<MutableSet<Obj>>()
+    for (i in 0..NUM_FLOORS - 1)
+        victoryFloors.add(HashSet<Obj>())
+
+    victoryFloors[3].add(ELEVATOR)
+    victoryFloors[3].add(SG)
+    victoryFloors[3].add(SM)
+    victoryFloors[3].add(PG)
+    victoryFloors[3].add(PM)
+    victoryFloors[3].add(TG)
+    victoryFloors[3].add(RG)
+    victoryFloors[3].add(RM)
+    victoryFloors[3].add(CG)
+    victoryFloors[3].add(CM)
+    victoryFloors[3].add(TM)
+
+    val initState = State(initFloors)
+    val victoryState = State(victoryFloors)
 
     println(initState.pairs())
     println(victoryState.pairs())
@@ -104,26 +116,47 @@ data class Generator(override val type: Char) : Obj {
         return type + "G"
     }
 }
+
 data class Elevator(override val type: Char = 'E') : Obj {
     override fun toString(): String {
         return "E"
     }
 }
 
-data class State(val floors: MutableList<MutableSet<Obj>> = ArrayList<MutableSet<Obj>>()) {
-    init {
-        if (floors.isEmpty())
-            for (i in 0..3)
-                floors.add(HashSet<Obj>())
+data class State(val floors: MutableList<MutableSet<Obj>>) : Comparable<State> {
+
+    override fun compareTo(other: State): Int {
+        pairs.hashCode() - s2.pairs().hashCode()
+        throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    fun pairs(): Set<Set<Int>>{
+    val pairs: Set<Set<Int>>
+
+    init {
+        val map = HashMap<Char, Int>()
+        pairs = HashSet<Set<Int>>()
+        for (i in 0..floors.size - 1) {
+            for (obj in floors[i]) {
+                val v = map[obj.type]
+                if (v != null)
+                    pairs.add(setOf(v, i))
+                else
+                    map[obj.type] = i
+            }
+        }
+    }
+
+    fun repr() {
+
+    }
+
+    fun pairs(): Set<Set<Int>> {
         val map = HashMap<Char, Int>()
         val pairs = HashSet<Set<Int>>()
-        for(i in 0..floors.size - 1) {
-            for(obj in floors[i]) {
+        for (i in 0..floors.size - 1) {
+            for (obj in floors[i]) {
                 val v = map[obj.type]
-                if(v != null)
+                if (v != null)
                     pairs.add(setOf(v, i))
                 else
                     map[obj.type] = i
@@ -171,14 +204,14 @@ data class State(val floors: MutableList<MutableSet<Obj>> = ArrayList<MutableSet
 
         val added = HashSet<Set<Obj>>()
 
-        for(obj1 in fromFloor){
+        for (obj1 in fromFloor) {
             val newState = newState.copy()
 
             newState.moveToFloor(obj1, from, to)
             states.add(newState)
-            for(obj2 in fromFloor){
+            for (obj2 in fromFloor) {
                 val items = setOf(obj1, obj2)
-                if(obj1 == obj2 || added.contains(items))
+                if (obj1 == obj2 || added.contains(items))
                     continue
 
                 added.add(items)
