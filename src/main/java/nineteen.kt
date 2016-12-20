@@ -1,26 +1,19 @@
 import org.magicwerk.brownies.collections.GapList
-import java.util.*
-
-/**
- * Created by Tim Lindeberg on 12/19/2016.
- */
+import java.io.File
 
 fun main(args: Array<String>) {
-    val elves = LinkedList<Int>()
-    elves += 1..3014387
+    val numElves = File("input/nineteen.txt").readText().toInt()
+    val elves = GapList<Int>()
+    elves += 1 .. numElves
 
-    var it = elves.listIterator()
-    var remove = false
     while (elves.size > 1) {
-        if (!it.hasNext()) {
-            it = elves.listIterator()
-            continue
+        var i = 0
+        while(i < elves.size){
+            val j = (i + elves.size / 2) % elves.size
+            elves.removeAt(j)
+            if(j > i)
+                i++
         }
-
-        it.next()
-        if (remove) it.remove()
-
-        remove = !remove
     }
-    println(elves.first)
+    println(elves)
 }
