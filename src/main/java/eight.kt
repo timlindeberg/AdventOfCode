@@ -1,12 +1,12 @@
 import java.io.File
 
-val WIDTH = 50
-val HEIGHT = 6
+private val WIDTH = 50
+private val HEIGHT = 6
 
-val RECT = """rect (\d+)x(\d+)""".toRegex()
-val ROTATE_COL = """rotate column x=(\d+) by (\d+)""".toRegex()
-val ROTATE_ROW = """rotate row y=(\d+) by (\d+)""".toRegex()
-val OPERATIONS = arrayOf(Operation(RECT, ::rect), Operation(ROTATE_COL, ::rotateCol), Operation(ROTATE_ROW, ::rotateRow))
+private val RECT = """rect (\d+)x(\d+)""".toRegex()
+private val ROTATE_COL = """rotate column x=(\d+) by (\d+)""".toRegex()
+private val ROTATE_ROW = """rotate row y=(\d+) by (\d+)""".toRegex()
+private val OPERATIONS = arrayOf(Operation(RECT, ::rect), Operation(ROTATE_COL, ::rotateCol), Operation(ROTATE_ROW, ::rotateRow))
 
 data class Operation(val regex: Regex, val func: (Array<Array<Char>>, Int, Int) -> Array<Array<Char>>)
 fun main(args: Array<String>) {

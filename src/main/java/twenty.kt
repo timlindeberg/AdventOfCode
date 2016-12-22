@@ -11,12 +11,16 @@ fun main(args: Array<String>) {
         Pair(vals[0].toLong(), vals[1].toLong())
     }.sortedBy { it.first }
 
+    println("Num: ${numValid(ranges)}")
+}
+
+fun numValid(ranges: List<Pair<Long, Long>>): Long {
     var max = 0L
-    var numValid = 0L
+    var num = 0L
     for ((first, last) in ranges) {
         if (first > max)
-            numValid += (first - max) - 1
+            num += (first - max) - 1
         max = Math.max(max, last)
     }
-    println("Num: $numValid")
+    return num
 }
